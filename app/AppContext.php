@@ -9,20 +9,28 @@ use compact\logging\Logger;
 use compact\handler\impl\json\Json;
 use compact\handler\impl\json\JsonHandler;
 use app\links\LinksContext;
+use lib\MultiAppContext;
 
 /**
  *
  * @author eaboxt
  *        
  */
-class AppContext implements IAppContext
+class AppContext extends MultiAppContext
 {
+
+    public function __construct()
+    {
+        parent::__construct();
+        
+        $this->add('/links', new LinksContext());
+    }
     /*
      * (non-PHPdoc) @see \compact\IAppContext::handlers()
      */
     public function handlers(Context $ctx)
     {
-        LinksContext::get()->handlers($ctx);
+        parent::handlers($ctx);
         
         // Add Json hander to handle JSON responses
         $ctx->addHandler(new JsonHandler());
@@ -33,11 +41,14 @@ class AppContext implements IAppContext
      */
     public function routes(Router $router)
     {
-        $router->add('^/$', function(){
-            return new Json(array("error"=>"No route specified."));
-        });
+        parent::routes($router);
         
-        LinksContext::get()->routes($router);
+        $router->add('^/$', function ()
+        {
+            return new Json(array(
+                "error" => "No route specified."
+            ));
+        });
     }
     
     /*
@@ -45,6 +56,6 @@ class AppContext implements IAppContext
      */
     public function services(Context $ctx)
     {
-        LinksContext::get()->services($ctx);
+        parent::services($ctx);
     }
 }
