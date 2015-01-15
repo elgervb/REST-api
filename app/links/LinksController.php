@@ -6,6 +6,7 @@ use compact\repository\DefaultModelConfiguration;
 use compact\handler\impl\json\Json;
 use app\links\db\LinkModel;
 use compact\Context;
+use compact\utils\ModelUtils;
 
 /**
  *
@@ -16,8 +17,6 @@ class LinksController
 {
 
     private $db;
-    
-    
 
     /**
      * Constructor
@@ -33,9 +32,10 @@ class LinksController
 
     /**
      * Returns all links or just one when the GUID has been set
-     * 
-     * @param $guid [optional] The guid of the link
-     * 
+     *
+     * @param $guid [optional]
+     *            The guid of the link
+     *            
      * @return \compact\handler\impl\json\Json The JSON response
      */
     public function get($guid = false)
@@ -47,14 +47,16 @@ class LinksController
         
         return new Json($this->db->search($sc));
     }
-    
+
     /**
      * Add a new link
      */
-    public function post(){
-        
+    public function post()
+    {
+        $model = ModelUtils::getPost($this->db->getModelConfiguration());
+        $this->db->save($model);
     }
-    
+
     /**
      * Set the CORS headers
      *
@@ -68,23 +70,22 @@ class LinksController
         $httpContext = Context::get()->http();
         $request = $httpContext->getRequest();
         $response = $httpContext->getResponse();
-        	
-        $response->addHeader( 'Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, HEAD, PATCH, OPTIONS' );
-        	
+        
+        $response->addHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, HEAD, PATCH, OPTIONS');
+        
         // origin
-        $origin = $request->getHeader( 'Origin' );
+        $origin = $request->getHeader('Origin');
         if ($origin)
-            $response->addHeader( 'Access-Control-Allow-Origin', $origin ); // or use '*' to allow all
-    
-    
+            $response->addHeader('Access-Control-Allow-Origin', $origin); // or use '*' to allow all
+                                                                              
         // custom headers
-        $xHeaders = $request->getHeader( 'Access-Control-Request-Headers' );
+        $xHeaders = $request->getHeader('Access-Control-Request-Headers');
         if ($xHeaders)
-            $response->addHeader( 'Access-Control-Allow-Headers', $xHeaders );
-        	
-        $response->addHeader( 'Access-Control-Allow-Credentials', 'true' );
-        	
+            $response->addHeader('Access-Control-Allow-Headers', $xHeaders);
+        
+        $response->addHeader('Access-Control-Allow-Credentials', 'true');
+        
         // change preflight request
-        $response->addHeader( 'Access-Control-Max-Age', 1800 );
+        $response->addHeader('Access-Control-Max-Age', 1800);
     }
 }
