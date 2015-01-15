@@ -1,0 +1,94 @@
+FINEST No AppContext found
+WARNING No route found for /
+FINEST Including site contextapp\AppContext
+FINE Found route \/
+FINEST Including site contextapp\AppContext
+FINE Found route \/
+FINEST Including site contextapp\AppContext
+FINE Found route \/
+WARNING Could not find a handler for compact\handler\impl\json\Json
+FINEST Including site contextapp\AppContext
+FINE Found route \/
+ERROR Handle exception compact\handler\AssertionFailedException Assertion failed:
+	File: E:\pv\UwAmp\www\git\compact\classes\compact\handler\impl\json\JsonHandler.php
+	Line: 29
+	Code: $object instanceof core\mvc\impl\json\Json
+
+ERROR #0 [internal function]: compact\handler\AssertHandler::compact\handler\{closure}('E:\pv\UwAmp\www...', 29, '$object instanc...')
+#1 E:\pv\UwAmp\www\git\compact\classes\compact\handler\impl\json\JsonHandler.php(29): assert('$object instanc...')
+#2 E:\pv\UwAmp\www\git\compact\classes\compact\mvvm\FrontController.php(132): compact\handler\impl\json\JsonHandler->handle(Object(compact\handler\impl\json\Json))
+#3 E:\pv\UwAmp\www\git\api\index.php(8): compact\mvvm\FrontController->run()
+#4 {main}
+FINEST Including site contextapp\AppContext
+FINE Found route \/
+ERROR Handle exception compact\handler\AssertionFailedException Assertion failed:
+	File: E:\pv\UwAmp\www\git\compact\classes\compact\handler\impl\json\JsonHandler.php
+	Line: 30
+	Code: $object instanceof core\mvc\impl\json\Json
+
+ERROR #0 [internal function]: compact\handler\AssertHandler::compact\handler\{closure}('E:\pv\UwAmp\www...', 30, '$object instanc...')
+#1 E:\pv\UwAmp\www\git\compact\classes\compact\handler\impl\json\JsonHandler.php(30): assert('$object instanc...')
+#2 E:\pv\UwAmp\www\git\compact\classes\compact\mvvm\FrontController.php(132): compact\handler\impl\json\JsonHandler->handle(Object(compact\handler\impl\json\Json))
+#3 E:\pv\UwAmp\www\git\api\index.php(8): compact\mvvm\FrontController->run()
+#4 {main}
+FINEST Including site contextapp\AppContext
+FINE Found route \/
+ERROR Handle exception compact\handler\AssertionFailedException Assertion failed:
+	File: E:\pv\UwAmp\www\git\compact\classes\compact\handler\impl\json\JsonHandler.php
+	Line: 30
+	Code: $object instanceof Json
+
+ERROR #0 [internal function]: compact\handler\AssertHandler::compact\handler\{closure}('E:\pv\UwAmp\www...', 30, '$object instanc...')
+#1 E:\pv\UwAmp\www\git\compact\classes\compact\handler\impl\json\JsonHandler.php(30): assert('$object instanc...')
+#2 E:\pv\UwAmp\www\git\compact\classes\compact\mvvm\FrontController.php(132): compact\handler\impl\json\JsonHandler->handle(Object(compact\handler\impl\json\Json))
+#3 E:\pv\UwAmp\www\git\api\index.php(8): compact\mvvm\FrontController->run()
+#4 {main}
+FINEST Including site contextapp\AppContext
+FINE Found route \/
+ERROR Handle exception compact\handler\AssertionFailedException Assertion failed:
+	File: E:\pv\UwAmp\www\git\compact\classes\compact\handler\impl\json\JsonHandler.php
+	Line: 30
+	Code: $object instanceof Json
+
+ERROR #0 [internal function]: compact\handler\AssertHandler::compact\handler\{closure}('E:\pv\UwAmp\www...', 30, '$object instanc...')
+#1 E:\pv\UwAmp\www\git\compact\classes\compact\handler\impl\json\JsonHandler.php(30): assert('$object instanc...')
+#2 E:\pv\UwAmp\www\git\compact\classes\compact\mvvm\FrontController.php(132): compact\handler\impl\json\JsonHandler->handle(Object(compact\handler\impl\json\Json))
+#3 E:\pv\UwAmp\www\git\api\index.php(8): compact\mvvm\FrontController->run()
+#4 {main}
+FINEST Including site contextapp\AppContext
+FINE Found route \/
+ERROR Handle exception compact\handler\AssertionFailedException Assertion failed:
+	File: E:\pv\UwAmp\www\git\compact\classes\compact\handler\impl\json\JsonHandler.php
+	Line: 30
+	Code: $object instanceof Json
+
+ERROR #0 [internal function]: compact\handler\AssertHandler::compact\handler\{closure}('E:\pv\UwAmp\www...', 30, '$object instanc...')
+#1 E:\pv\UwAmp\www\git\compact\classes\compact\handler\impl\json\JsonHandler.php(30): assert('$object instanc...')
+#2 E:\pv\UwAmp\www\git\compact\classes\compact\mvvm\FrontController.php(132): compact\handler\impl\json\JsonHandler->handle(Object(compact\handler\impl\json\Json))
+#3 E:\pv\UwAmp\www\git\api\index.php(8): compact\mvvm\FrontController->run()
+#4 {main}
+FINEST Including site contextapp\AppContext
+FINE Found route \/
+ERROR Handle exception compact\handler\AssertionFailedException Assertion failed:
+	File: E:\pv\UwAmp\www\git\compact\classes\compact\handler\impl\json\JsonHandler.php
+	Line: 30
+	Code: $object instanceof Json
+
+ERROR #0 [internal function]: compact\handler\AssertHandler::compact\handler\{closure}('E:\pv\UwAmp\www...', 30, '$object instanc...')
+#1 E:\pv\UwAmp\www\git\compact\classes\compact\handler\impl\json\JsonHandler.php(30): assert('$object instanc...')
+#2 E:\pv\UwAmp\www\git\compact\classes\compact\mvvm\FrontController.php(132): compact\handler\impl\json\JsonHandler->handle(Object(compact\handler\impl\json\Json))
+#3 E:\pv\UwAmp\www\git\api\index.php(8): compact\mvvm\FrontController->run()
+#4 {main}
+FINEST Including site contextapp\AppContext
+FINE Found route \/
+FINEST Including site contextapp\AppContext
+FINE Found route \/
+FINEST Encoding JSON: object length: 31
+FINEST Including site contextapp\AppContext
+FINE Found route \/
+FINEST Encoding JSON: object length: 31
+FINEST Including site contextapp\AppContext
+FINE Found route \/
+FINEST Encoding JSON: object length: 31
+FINEST Including site contextapp\AppContext
+WARNING No route found for /links

@@ -1,0 +1,1 @@
+[15-Jan-2015 11:45:27 CET] PHP Fatal error:  Call to undefined method compact\Context::getHttpContext() in E:\pv\UwAmp\www\git\compact\classes\compact\handler\impl\json\JsonHandler.php on line 35
