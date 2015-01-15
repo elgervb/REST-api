@@ -15,6 +15,8 @@ class LinksContext implements IAppContext
 {
 
     private static $INSTANCE;
+    
+    private static $GUID_REGEX = "([a-z0-9]{8})-([a-z0-9]{4})-([a-z0-9]{4})-([a-z0-9]{4})-([a-z0-9]{12})";
 
     /**
      * Returns the singleton for LinksContext
@@ -48,10 +50,21 @@ class LinksContext implements IAppContext
     public function routes(Router $router)
     {
         $ctrl = new LinksController();
+        
         // return all links
-        $router->add('/links', function() use ($ctrl){
+        $router->add('/links/?$', function() use ($ctrl){
             return $ctrl->get();
-        });
+        }, 'GET');
+        
+        // Add a new link
+        $router->add('/links/?$', function() use ($ctrl){
+            return $ctrl->post();
+        }, 'POST');
+        
+        // return one link
+        $router->add('/links/('.self::$GUID_REGEX.')/?$', function($guid) use ($ctrl){
+            return $ctrl->get($guid);
+        }, 'GET');
     }
 
     /**
