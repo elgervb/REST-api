@@ -4,6 +4,7 @@ namespace app\links;
 use compact\IAppContext;
 use compact\Context;
 use compact\routing\Router;
+use links\LinksController;
 
 /**
  *
@@ -13,7 +14,7 @@ use compact\routing\Router;
 class LinksContext implements IAppContext
 {
 
-    private $INSTANCE;
+    private static $INSTANCE;
 
     /**
      * Returns the singleton for LinksContext
@@ -46,7 +47,11 @@ class LinksContext implements IAppContext
      */
     public function routes(Router $router)
     {
-        //
+        $ctrl = new LinksController();
+        // return all links
+        $router->add('/links', function() use ($ctrl){
+            return $ctrl->get();
+        });
     }
 
     /**

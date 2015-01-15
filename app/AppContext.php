@@ -8,6 +8,7 @@ use compact\handler\AssertHandler;
 use compact\logging\Logger;
 use compact\handler\impl\json\Json;
 use compact\handler\impl\json\JsonHandler;
+use app\links\LinksContext;
 
 /**
  *
@@ -21,6 +22,8 @@ class AppContext implements IAppContext
      */
     public function handlers(Context $ctx)
     {
+        LinksContext::get()->handlers($ctx);
+        
         // Add Json hander to handle JSON responses
         $ctx->addHandler(new JsonHandler());
     }
@@ -33,6 +36,8 @@ class AppContext implements IAppContext
         $router->add('^/$', function(){
             return new Json(array("error"=>"No route specified."));
         });
+        
+        LinksContext::get()->routes($router);
     }
     
     /*
@@ -40,6 +45,6 @@ class AppContext implements IAppContext
      */
     public function services(Context $ctx)
     {
-        
+        LinksContext::get()->services($ctx);
     }
 }
