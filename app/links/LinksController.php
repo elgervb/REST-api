@@ -45,7 +45,7 @@ class LinksController
     public function delete($aGuid)
     {
         if (! $aGuid)
-            return new HttpStatus(404);
+            return new HttpStatus(HttpStatus::STATUS_404_NOT_FOUND);
         
         $sc = $this->db->createSearchCriteria();
         if ($guid) {
@@ -54,16 +54,16 @@ class LinksController
         
         $result = $this->db->search($sc);
         if ($result->count() <= 0) {
-            return new HttpStatus(404);
+            return new HttpStatus(HttpStatus::STATUS_404_NOT_FOUND);
         }
         
         $model = $result->offsetGet(0);
         
         if ($this->db->delete($model)) {
-            return new HttpStatus(200);
+            return new HttpStatus(HttpStatus::STATUS_200_OK);
         } else {
             Logger::get()->logWarning("Could not delete model " . get_class($model) . ' with GUID ' . $aGuid);
-            return new HttpStatus(404);
+            return new HttpStatus(HttpStatus::STATUS_404_NOT_FOUND);
         }
     }
 
@@ -86,15 +86,15 @@ class LinksController
         
         $result = $this->db->search($sc);
         if ($result->count() > 0) {
-            return new HttpStatus(200, new Json($result));
+            return new HttpStatus(HttpStatus::STATUS_200_OK, new Json($result));
         }
-        return new HttpStatus(204);
+        return new HttpStatus(HttpStatus::STATUS_204_NO_CONTENT);
     }
 
     
     public function head($guid = null)
     {
-        return new HttpStatus(501); // not yet implemented
+        return new HttpStatus(HttpStatus::STATUS_501_NOT_IMPLEMENTED); // not yet implemented
     }
 
     /**
@@ -104,7 +104,7 @@ class LinksController
      */
     public function options()
     {
-        return new HttpStatus(200); // 200 ok
+        return new HttpStatus(HttpStatus::STATUS_200_OK); // 200 ok
     }
 
     /**
@@ -124,11 +124,11 @@ class LinksController
         
         if ($this->db->save($model)) {
             // TODO add location header
-            return new HttpStatus(201, new Json($model));
+            return new HttpStatus(HttpStatus::STATUS_201_CREATED, new Json($model));
         }
         
         Logger::get()->logWarning("Could not save model " . get_class($model));
-        return new HttpStatus(204);
+        return new HttpStatus(HttpStatus::STATUS_204_NO_CONTENT);
     }
 
     /**
@@ -143,7 +143,7 @@ class LinksController
     public function putAction($guid)
     {
         if (! $guid)
-            return new HttpStatus(404);
+            return new HttpStatus(HttpStatus::STATUS_404_NOT_FOUND);
         
         $sc = $this->db->createSearchCriteria();
         if ($guid) {
@@ -153,21 +153,21 @@ class LinksController
         // check if model exists
         $result = $this->db->search($sc);
         if ($result->count() <= 0) {
-            return new HttpStatus(404);
+            return new HttpStatus(HttpStatus::STATUS_404_NOT_FOUND);
         }
         
         $model = ModelUtils::getPost($this->db->getModelConfiguration(), new Model());
         
         if (ModelUtils::isEmpty($model, $this->db->getModelConfiguration()->getFieldNames($model))) {
-            return new HttpStatus(204);
+            return new HttpStatus(HttpStatus::STATUS_204_NO_CONTENT);
         }
         
         if ($this->db->save($model)) {
-            return new HttpStatus(200, new Json($model));
+            return new HttpStatus(HttpStatus::STATUS_200_OK, new Json($model));
         }
         
         Logger::get()->logWarning("Could not update model " . get_class($model) . ' with GUID ' . $aGuid);
-        return new HttpStatus(404);
+        return new HttpStatus(HttpStatus::STATUS_404_NOT_FOUND);
     }
 
     /**
@@ -182,7 +182,7 @@ class LinksController
     public function patchAction($guid)
     {
         if (! $guid)
-            return new HttpStatus(404);
+            return new HttpStatus(HttpStatus::STATUS_404_NOT_FOUND);
         
         $sc = $this->db->createSearchCriteria();
         if ($guid) {
@@ -192,7 +192,7 @@ class LinksController
         // check if model exists
         $result = $this->db->search($sc);
         if ($result->count() <= 0) {
-            return new HttpStatus(404);
+            return new HttpStatus(HttpStatus::STATUS_404_NOT_FOUND);
         }
         $model = $result->offsetGet(0);
         
@@ -206,15 +206,15 @@ class LinksController
         try {
             ModelUtils::mergeInto($model, $postModel, $fields);
         } catch (MergeException $e) {
-            return new HttpStatus(204); // no content
+            return new HttpStatus(HttpStatus::STATUS_204_NO_CONTENT); // no content
         }
         
         if ($this->db->save($dbModel)){
-            return new HttpStatus(200, new Json($dbModel));
+            return new HttpStatus(HttpStatus::STATUS_200_OK, new Json($dbModel));
         }
         
         Logger::get()->logWarning("Could not patch model " . get_class($model) . ' with GUID ' . $aGuid);
-        return new HttpStatus(404);
+        return new HttpStatus(HttpStatus::STATUS_404_NOT_FOUND);
     }
 
     /**
