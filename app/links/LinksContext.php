@@ -35,9 +35,19 @@ class LinksContext implements IAppContext
     {
         $ctrl = new LinksController();
         
+        // Enable CORS preflight request
+        $router->add('.*', function() {
+            return " ";
+        }, 'OPTIONS');
+        
         // return all links
         $router->add('^/links/?$', function() use ($ctrl){
             return $ctrl->get();
+        }, 'GET');
+        
+        // return one link
+        $router->add('^/links/('.self::$GUID_REGEX.')/?$', function($guid) use ($ctrl){
+            return $ctrl->get($guid);
         }, 'GET');
         
         // Add a new link
@@ -45,10 +55,7 @@ class LinksContext implements IAppContext
             return $ctrl->post();
         }, 'POST');
         
-        // return one link
-        $router->add('^/links/('.self::$GUID_REGEX.')/?$', function($guid) use ($ctrl){
-            return $ctrl->get($guid);
-        }, 'GET');
+        
     }
 
     /**
