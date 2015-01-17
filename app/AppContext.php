@@ -10,6 +10,7 @@ use compact\handler\impl\json\Json;
 use compact\handler\impl\json\JsonHandler;
 use app\links\LinksContext;
 use lib\MultiAppContext;
+use compact\handler\impl\http\HttpStatusHandler;
 
 /**
  *
@@ -34,6 +35,9 @@ class AppContext extends MultiAppContext
         
         // Add Json hander to handle JSON responses
         $ctx->addHandler(new JsonHandler());
+        
+        // add HttpStatus handler
+        $ctx->addHandler(new HttpStatusHandler());
     }
     
     /*
