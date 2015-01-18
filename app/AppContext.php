@@ -11,6 +11,7 @@ use compact\handler\impl\json\JsonHandler;
 use app\links\LinksContext;
 use lib\MultiAppContext;
 use compact\handler\impl\http\HttpStatusHandler;
+use user\UserContext;
 
 /**
  *
@@ -25,6 +26,7 @@ class AppContext extends MultiAppContext
         parent::__construct();
         
         $this->add('/links', new LinksContext());
+        $this->add('/user', new UserContext());
     }
     /*
      * (non-PHPdoc) @see \compact\IAppContext::handlers()
