@@ -3,7 +3,7 @@ BEGIN TRANSACTION;
     "id" INTEGER PRIMARY KEY AUTOINCREMENT,
     "guid" TEXT NOT NULL,
     "username" TEXT NOT NULL,
-    "password" INTEGER NOT NULL,
+    "password" TEXT NOT NULL,
     "active" INTEGER NOT NULL DEFAULT (1),
     "ip" TEXT,
     "full_name" TEXT,
