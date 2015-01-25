@@ -83,7 +83,7 @@ class UserController
         $user = $this->auth->login($username, $password);
         
         if ($user) {
-            return new HttpStatus(HttpStatus::STATUS_200_OK, $user);
+            return new HttpStatus(HttpStatus::STATUS_200_OK, new Json($user));
         }
         
         return new HttpStatus(HttpStatus::STATUS_204_NO_CONTENT);
