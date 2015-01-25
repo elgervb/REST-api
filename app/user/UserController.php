@@ -27,7 +27,6 @@ class UserController
         $sqliteSqlPath = Context::get()->basePath('app/user/db/user.sqlite.sql');
         $dbPath = $sqliteSqlPath->getPath() . '/user.sqlite';
         $config = new SQLiteDynamicModelConfiguration('user');
-        $config->setIdGeneration("guid");
         $startQuery = "";
         
         if (! file_exists($dbPath)) {
