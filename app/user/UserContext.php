@@ -14,7 +14,8 @@ class UserContext implements IAppContext
      */
     public function handlers(Context $ctx)
     {
-        //
+        // start session
+        Context::get()->http()->getSession()->start();
     }
     
     /*
