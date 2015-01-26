@@ -12,6 +12,10 @@ use app\links\LinksContext;
 use lib\MultiAppContext;
 use compact\handler\impl\http\HttpStatusHandler;
 use user\UserContext;
+use compact\repository\pdo\sqlite\SQLiteDynamicModelConfiguration;
+use compact\repository\pdo\sqlite\SQLiteRepository;
+use compact\auth\provider\PDOAuthProvider;
+use compact\auth\impl\SessionAuth;
 
 /**
  *
@@ -27,6 +31,20 @@ class AppContext extends MultiAppContext
         
         $this->add('/links', new LinksContext());
         $this->add('/user', new UserContext());
+    }
+    
+    public function createUserRepository(){
+        // Create SQlite DB when needed
+        $sqliteSqlPath = Context::get()->basePath('app/user/db/user.sqlite.sql');
+        $dbPath = $sqliteSqlPath->getPath() . '/user.sqlite';
+        $config = new SQLiteDynamicModelConfiguration('user');
+        $startQuery = "";
+        
+        if (! file_exists($dbPath)) {
+            $startQuery = file_get_contents($sqliteSqlPath);
+        }
+        
+        return new SQLiteRepository($config, "sqlite:" . $sqliteSqlPath->getPath() . '/user.sqlite', $startQuery);
     }
     /*
      * (non-PHPdoc) @see \compact\IAppContext::handlers()
@@ -52,6 +70,7 @@ class AppContext extends MultiAppContext
         $router->add('^/$', function ()
         {
             return new Json(array(
+                "status-code" => 404,
                 "error" => "No route specified."
             ));
         });
@@ -63,5 +82,12 @@ class AppContext extends MultiAppContext
     public function services(Context $ctx)
     {
         parent::services($ctx);
+        
+        $db = $this->createUserRepository();
+        
+        $ctx->addService(Context::SERVICE_AUTH, function () use ($db)
+        {
+            return new SessionAuth(new PDOAuthProvider($db));
+        });
     }
 }
