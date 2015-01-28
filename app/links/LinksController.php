@@ -110,12 +110,15 @@ class LinksController
     /**
      * Create a new model
      *
-     * @return HttpStatus 201 | 204 //
+     * @return HttpStatus 201 | 204 | 409 | 422 //
      *         201: created with a location header to the new /model/{id} containing the new ID,
-     *         204 no content: when no post data available
+     *         204 no content: when no post data available,
+     *         409 conflict on double entry
+     *         422 Unprocessable Entity on validation errors
      */
     public function post()
     {
+        // TODO implement 409 && 422
         $model = ModelUtils::getPost($this->db->getModelConfiguration());
         
         if (ModelUtils::isEmpty($model, $this->db->getModelConfiguration()->getFieldNames($model))) {
