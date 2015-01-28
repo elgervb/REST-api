@@ -12,10 +12,15 @@ use compact\validation\ValidationException;
 use compact\utils\Random;
 use compact\mail\Sendmail;
 use compact\mvvm\impl\ViewModel;
+use compact\http\HttpSession;
 
 class UserController
 {
 
+    /**
+     *
+     * @var \compact\auth\IAuthService
+     */
     private $auth;
 
     private $db;
@@ -110,6 +115,17 @@ class UserController
         }
         
         return new HttpStatus(HttpStatus::STATUS_204_NO_CONTENT);
+    }
+
+    /**
+     * Logs the user out of the system
+     *
+     * @return \compact\handler\impl\http\HttpStatus 200 ok
+     */
+    public function logout()
+    {
+        $this->auth->logout();
+        return new HttpStatus(200);
     }
 
     /**
