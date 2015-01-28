@@ -36,6 +36,39 @@ class UserController
     }
 
     /**
+     * Activates a user based on his activation code.
+     *
+     * @param string $activationCode            
+     *
+     * @return HttpStatus 200 | 204 //
+     *         200 ok when the user has been found and has been activated
+     *         204 no content when no valid user could be found
+     */
+    public function activate($activationCode)
+    {
+        $sc = $this->db->createSearchCriteria();
+        $sc->where(UserModel::ACTIVATION, $activationCode);
+        $sc->where(UserModel::ACTIVE, false);
+        
+        // see if we can find a user which is not active and has the activation code
+        $result = $this->db->search($sc);
+        
+        if ($result->count() > 0) {
+            // get the first user
+            $user = $result->offsetGet(0);
+            
+            // ok, found a user. Now activate...
+            $user->{UserModel::ACTIVATION} = true;
+            
+            $this->db->save($user);
+            
+            return new HttpStatus(200);
+        }
+        
+        return new HttpStatus(204);
+    }
+
+    /**
      * Returns all models or just one when the GUID has been set
      *
      * @param $guid [optional]
@@ -118,10 +151,9 @@ class UserController
         $mail->from("elgervb@gmail.com", "Links");
         $mail->subject("Activation link for your links account");
         $tpl = new ViewModel('activationlink.html');
-        $tpl->{"activationlink"} = Context::siteUrl() . "/user/activate/". $user->get(UserModel::ACTIVATION);
+        $tpl->{"activationlink"} = Context::siteUrl() . "/user/activate/" . $user->get(UserModel::ACTIVATION);
         $mail->text($tpl->render());
         $mail->send();
-        
         
         return new HttpStatus(200, new Json($user));
     }
