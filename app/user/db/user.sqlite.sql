@@ -9,7 +9,9 @@ BEGIN TRANSACTION;
     "full_name" TEXT,
     "email" TEXT NOT NULL,
     "timestamp" TIMESTAMP default CURRENT_TIMESTAMP,
-    "admin" INTEGER NOT NULL DEFAULT (0)
+    "admin" INTEGER NOT NULL DEFAULT (0),
+    "activation" TEXT,
+    "context" TEXT
   );
   CREATE UNIQUE INDEX "uq_guid" on user (guid ASC);
   CREATE UNIQUE INDEX "uq_username" on user (username ASC);

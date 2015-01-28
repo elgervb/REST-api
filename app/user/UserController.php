@@ -7,6 +7,11 @@ use compact\handler\impl\http\HttpStatus;
 use compact\handler\impl\json\Json;
 use app\AppContext;
 use compact\auth\IAuthService;
+use compact\utils\ModelUtils;
+use compact\validation\ValidationException;
+use compact\utils\Random;
+use compact\mail\Sendmail;
+use compact\mvvm\impl\ViewModel;
 
 class UserController
 {
@@ -17,9 +22,12 @@ class UserController
 
     public function __construct()
     {
-        
         $this->auth = Context::get()->getService(Context::SERVICE_AUTH);
-        assert ('$this->auth instanceof \compact\auth\IAuthService');
+        assert('$this->auth instanceof \compact\auth\IAuthService');
+        
+        /* @var $appCtx \app\AppContext */
+        $appCtx = Context::get()->getAppContext();
+        $this->db = $appCtx->createUserRepository();
         
         // allow CORS
         Context::get()->http()
@@ -39,16 +47,12 @@ class UserController
      */
     public function get($guid = false)
     {
-        /* @var $appCtx \app\AppContext */
-        $appCtx = Context::get()->getAppContext();
-        $db = $appCtx->createUserRepository();
-        
-        $sc = $db->createSearchCriteria();
+        $sc = $this->db->createSearchCriteria();
         if ($guid) {
             $sc->where(UserModel::GUID, $guid);
         }
         
-        $result = $db->search($sc);
+        $result = $this->db->search($sc);
         if ($result->count() > 0) {
             return new HttpStatus(HttpStatus::STATUS_200_OK, new Json($result));
         }
@@ -58,7 +62,7 @@ class UserController
     /**
      * Logs in the user
      *
-     * @return \compact\handler\impl\http\HttpStatus
+     * @return \compact\handler\impl\http\HttpStatus 200 or 204
      */
     public function login()
     {
@@ -73,5 +77,52 @@ class UserController
         }
         
         return new HttpStatus(HttpStatus::STATUS_204_NO_CONTENT);
+    }
+
+    /**
+     * Register a new user.
+     * This user will be created with active=false and a activation mail will be send to the user.
+     * When the activation link has been visited, the user will be activated
+     *
+     * @return HttpStatus 201 | 204 | 409 | 422 //
+     *         201: created with a location header to the new /model/{id} containing the new ID,
+     *         204 no content: when no post data available,
+     *         409 conflict on double entry
+     *         422 Unprocessable Entity on validation errors or on error saving
+     */
+    public function register()
+    {
+        $request = Context::get()->http()->getRequest();
+        
+        $user = ModelUtils::getPost($this->db->getModelConfiguration());
+        $user->set(UserModel::IP, $request->getUserIP());
+        $user->set(UserModel::ACTIVATION, Random::guid());
+        $user->set(UserModel::ACTIVE, false);
+        
+        // save new user and do some error handling
+        try {
+            $this->db->save($user);
+        } catch (ValidationException $e) {
+            return new HttpStatus(422, new Json(array(
+                $e->getCode() => $e->getMessage()
+            )));
+        } catch (\PDOException $e) {
+            return new HttpStatus(500, new Json(array(
+                $e->getCode() => "Could not save resource"
+            )));
+        }
+        
+        // send the user a activation mail
+        $mail = new Sendmail();
+        $mail->to($user->get(UserModel::EMAIL));
+        $mail->from("elgervb@gmail.com", "Links");
+        $mail->subject("Activation link for your links account");
+        $tpl = new ViewModel('activationlink.html');
+        $tpl->{"activationlink"} = Context::siteUrl() . "/user/activate/". $user->get(UserModel::ACTIVATION);
+        $mail->text($tpl->render());
+        $mail->send();
+        
+        
+        return new HttpStatus(200, new Json($user));
     }
 }
