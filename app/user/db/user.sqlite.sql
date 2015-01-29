@@ -15,5 +15,5 @@ BEGIN TRANSACTION;
   );
   CREATE UNIQUE INDEX "uq_guid" on user (guid ASC);
   CREATE UNIQUE INDEX "uq_username" on user (username ASC);
-  INSERT INTO "user" VALUES(1, "0ab61594-f9d7-4d11-8a57-56ded1153810","admin","d033e22ae348aeb5660fc2140aec35850c4da997",1,"127.0.0.1","Administrator","adin@admin.com",1407503963201,1);
+  INSERT INTO "user" VALUES(1, "0ab61594-f9d7-4d11-8a57-56ded1153810","admin","d033e22ae348aeb5660fc2140aec35850c4da997",1,"127.0.0.1","Administrator","adin@admin.com",1407503963201,1,"","");
 COMMIT;
