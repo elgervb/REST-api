@@ -44,7 +44,7 @@ class AppContext extends MultiAppContext
             $startQuery = file_get_contents($sqliteSqlPath);
         }
         
-        return new SQLiteRepository($config, "sqlite:" . $sqliteSqlPath->getPath() . '/user.sqlite', $startQuery);
+        return new SQLiteRepository($config, "sqlite:" . $dbPath, $startQuery);
     }
     /*
      * (non-PHPdoc) @see \compact\IAppContext::handlers()
