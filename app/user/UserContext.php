@@ -31,9 +31,16 @@ class UserContext implements IAppContext
             return " ";
         }, 'OPTIONS');
         
+        // login
         $router->add('^/user/login/?$', function () use($ctrl)
         {
             return $ctrl->login();
+        }, 'POST');
+        
+        // register a new user
+        $router->add('^/user/register/?$', function () use($ctrl)
+        {
+            return $ctrl->register();
         }, 'POST');
         
         // For debugging purposes only... Exposes all users 

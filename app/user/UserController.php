@@ -13,6 +13,7 @@ use compact\utils\Random;
 use compact\mail\Sendmail;
 use compact\mvvm\impl\ViewModel;
 use compact\http\HttpSession;
+use compact\logging\Logger;
 
 class UserController
 {
@@ -111,6 +112,7 @@ class UserController
         $user = $this->auth->login($username, $password);
         
         if ($user) {
+            $user->{UserModel::PASSWORD} = "";
             return new HttpStatus(HttpStatus::STATUS_200_OK, new Json($user));
         }
         
@@ -146,31 +148,48 @@ class UserController
         $user = ModelUtils::getPost($this->db->getModelConfiguration());
         $user->set(UserModel::IP, $request->getUserIP());
         $user->set(UserModel::ACTIVATION, Random::guid());
-        $user->set(UserModel::ACTIVE, false);
+        $user->set(UserModel::ACTIVE, 0);
+        $user->set(UserModel::ADMIN, 0);
+        $user->{UserModel::PASSWORD} = sha1($user->{UserModel::PASSWORD});
+        
+        // check if user already exists
+        $sc = $this->db->createSearchCriteria();
+        $sc->where(UserModel::USERNAME, $user->{UserModel::USERNAME});
+        $result = $this->db->search($sc);
+        
+        if ($result->count() > 0){
+            return new HttpStatus(409, new Json(array("message"=>"Username already exists")));
+        }
         
         // save new user and do some error handling
         try {
             $this->db->save($user);
         } catch (ValidationException $e) {
             return new HttpStatus(422, new Json(array(
-                $e->getCode() => $e->getMessage()
+                "message" => $e->getMessage()
             )));
         } catch (\PDOException $e) {
-            return new HttpStatus(500, new Json(array(
-                $e->getCode() => "Could not save resource"
+            Logger::get()->logWarning("Could not save resource" . $e->getMessage());
+            
+            return new HttpStatus(422, new Json(array(
+                "message" => "Could not save resource"
             )));
         }
         
-        // send the user a activation mail
-        $mail = new Sendmail();
-        $mail->to($user->get(UserModel::EMAIL));
-        $mail->from("elgervb@gmail.com", "Links");
-        $mail->subject("Activation link for your links account");
-        $tpl = new ViewModel('activationlink.html');
-        $tpl->{"activationlink"} = Context::siteUrl() . "/user/activate/" . $user->get(UserModel::ACTIVATION);
-        $mail->text($tpl->render());
-        $mail->send();
+        Logger::get()->logNormal("Registered new user " . $user->{UserModel::USERNAME} . " with activation code " . $user->{UserModel::ACTIVATION});
         
+        
+        // send the user a activation mail
+        // TODO enable in production mode
+//         $mail = new Sendmail();
+//         $mail->to($user->get(UserModel::EMAIL));
+//         $mail->from("elgervb@gmail.com", "Links");
+//         $mail->subject("Activation link for your links account");
+//         $tpl = new ViewModel('activationlink.html');
+//         $tpl->{"activationlink"} = Context::siteUrl() . "/user/activate/" . $user->get(UserModel::ACTIVATION);
+//         $mail->text($tpl->render());
+//         $mail->send();
+        $user->{UserModel::PASSWORD} = "";
         return new HttpStatus(200, new Json($user));
     }
 }
