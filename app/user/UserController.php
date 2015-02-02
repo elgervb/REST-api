@@ -47,7 +47,7 @@ class UserController
      * @param string $activationCode            
      *
      * @return HttpStatus 200 | 204 //
-     *         200 ok when the user has been found and has been activated
+     *         200 ok when the user has been found and has been activated with a extra location header with the login url
      *         204 no content when no valid user could be found
      */
     public function activate($activationCode)
@@ -64,11 +64,12 @@ class UserController
             $user = $result->offsetGet(0);
             
             // ok, found a user. Now activate...
-            $user->{UserModel::ACTIVATION} = true;
+            $user->{UserModel::ACTIVATION} = "";
+            $user->{UserModel::ACTIVE} = true;
             
             $this->db->save($user);
             
-            return new HttpStatus(200);
+            return new HttpStatus(200, null, array('location' => Context::siteUrl() . '/user/login'));
         }
         
         return new HttpStatus(204);
@@ -177,7 +178,6 @@ class UserController
         }
         
         Logger::get()->logNormal("Registered new user " . $user->{UserModel::USERNAME} . " with activation code " . $user->{UserModel::ACTIVATION});
-        
         
         // send the user a activation mail
         // TODO enable in production mode

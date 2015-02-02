@@ -8,6 +8,7 @@ use compact\logging\Logger;
 
 class UserContext implements IAppContext
 {
+    private static $GUID_REGEX = "([a-zA-Z0-9]{8})-([a-zA-Z0-9]{4})-([a-zA-Z0-9]{4})-([a-zA-Z0-9]{4})-([a-zA-Z0-9]{12})";
     
     /*
      * (non-PHPdoc) @see \compact\IAppContext::handlers()
@@ -42,6 +43,12 @@ class UserContext implements IAppContext
         {
             return $ctrl->register();
         }, 'POST');
+        
+        // register a new user
+        $router->add('^/user/activate/('.self::$GUID_REGEX.')/?$', function ($guid) use($ctrl)
+        {
+            return $ctrl->activate($guid);
+        }, 'GET');
         
         // For debugging purposes only... Exposes all users 
 //         // return all users
