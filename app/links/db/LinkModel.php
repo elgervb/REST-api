@@ -16,4 +16,5 @@ class LinkModel extends Model
     const TAGS = "tags";
     const TIMESTAMP = "timestamp";
     const COUNT = "count";
+    const ISPRIVATE = "isprivate";
 }
