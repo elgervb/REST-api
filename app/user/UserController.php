@@ -47,7 +47,7 @@ class UserController
      * @param string $activationCode            
      *
      * @return HttpStatus 200 | 204 //
-     *         200 ok when the user has been found and has been activated with a extra location header with the login url
+     *         200 ok when the user has been found and has been activated
      *         204 no content when no valid user could be found
      */
     public function activate($activationCode)
@@ -69,7 +69,7 @@ class UserController
             
             $this->db->save($user);
             
-            return new HttpStatus(200, null, array('location' => Context::siteUrl() . '/user/login'));
+            return new HttpStatus(200);
         }
         
         return new HttpStatus(204);
@@ -158,8 +158,10 @@ class UserController
         $sc->where(UserModel::USERNAME, $user->{UserModel::USERNAME});
         $result = $this->db->search($sc);
         
-        if ($result->count() > 0){
-            return new HttpStatus(409, new Json(array("message"=>"Username already exists")));
+        if ($result->count() > 0) {
+            return new HttpStatus(409, new Json(array(
+                "message" => "Username already exists"
+            )));
         }
         
         // save new user and do some error handling
@@ -181,14 +183,14 @@ class UserController
         
         // send the user a activation mail
         // TODO enable in production mode
-//         $mail = new Sendmail();
-//         $mail->to($user->get(UserModel::EMAIL));
-//         $mail->from("elgervb@gmail.com", "Links");
-//         $mail->subject("Activation link for your links account");
-//         $tpl = new ViewModel('activationlink.html');
-//         $tpl->{"activationlink"} = Context::siteUrl() . "/user/activate/" . $user->get(UserModel::ACTIVATION);
-//         $mail->text($tpl->render());
-//         $mail->send();
+        // $mail = new Sendmail();
+        // $mail->to($user->get(UserModel::EMAIL));
+        // $mail->from("elgervb@gmail.com", "Links");
+        // $mail->subject("Activation link for your links account");
+        // $tpl = new ViewModel('activationlink.html');
+        // $tpl->{"activationlink"} = Context::siteUrl() . "/user/activate/" . $user->get(UserModel::ACTIVATION);
+        // $mail->text($tpl->render());
+        // $mail->send();
         $user->{UserModel::PASSWORD} = "";
         return new HttpStatus(200, new Json($user));
     }
