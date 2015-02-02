@@ -30,7 +30,9 @@ class LinksController
         $this->db = new JsonRepository(new DefaultModelConfiguration('app\links\db\LinkModel'), $file);
         
         // allow CORS
-        Context::get()->http()->getResponse()->setCORSHeaders();
+        Context::get()->http()
+            ->getResponse()
+            ->setCORSHeaders();
     }
 
     /**
@@ -91,7 +93,13 @@ class LinksController
         return new HttpStatus(HttpStatus::STATUS_204_NO_CONTENT);
     }
 
-    
+    /**
+     * Head request: not yet implemented
+     *
+     * @param string $guid            
+     *
+     * @return \compact\handler\impl\http\HttpStatus
+     */
     public function head($guid = null)
     {
         return new HttpStatus(HttpStatus::STATUS_501_NOT_IMPLEMENTED); // not yet implemented
@@ -125,9 +133,15 @@ class LinksController
             return new HttpStatus(204);
         }
         
-        if ($this->db->save($model)) {
-            // TODO add location header
-            return new HttpStatus(HttpStatus::STATUS_201_CREATED, new Json($model));
+        try {
+            if ($this->db->save($model)) {
+                // TODO add location header
+                return new HttpStatus(HttpStatus::STATUS_201_CREATED, new Json($model));
+            }
+        } catch (ValidationException $e) {
+            return new HttpStatus(HttpStatus::STATUS_422_UNPROCESSABLE_ENTITY, array(
+                "message" => $e->getMessage()
+            ));
         }
         
         Logger::get()->logWarning("Could not save model " . get_class($model));
@@ -212,13 +226,11 @@ class LinksController
             return new HttpStatus(HttpStatus::STATUS_204_NO_CONTENT); // no content
         }
         
-        if ($this->db->save($dbModel)){
+        if ($this->db->save($dbModel)) {
             return new HttpStatus(HttpStatus::STATUS_200_OK, new Json($dbModel));
         }
         
         Logger::get()->logWarning("Could not patch model " . get_class($model) . ' with GUID ' . $aGuid);
         return new HttpStatus(HttpStatus::STATUS_404_NOT_FOUND);
     }
-
-    
 }
