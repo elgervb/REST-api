@@ -1,8 +1,6 @@
 <?php
 namespace links;
 
-use compact\repository\json\JsonRepository;
-use compact\repository\DefaultModelConfiguration;
 use compact\handler\impl\json\Json;
 use app\links\db\LinkModel;
 use compact\Context;
@@ -12,6 +10,7 @@ use compact\handler\impl\http\HttpStatus;
 use compact\logging\Logger;
 use user\UserContext;
 use compact\auth\user\UserModel;
+use app\links\LinksContext;
 
 /**
  *
@@ -21,16 +20,11 @@ use compact\auth\user\UserModel;
 class LinksController
 {
 
-    private $db;
-
     /**
      * Constructor
      */
     public function __construct()
     {
-        $file = new \SplFileInfo(__DIR__ . '/db/links.json');
-        $this->db = new JsonRepository(new DefaultModelConfiguration('app\links\db\LinkModel'), $file);
-        
         // allow CORS
         Context::get()->http()
             ->getResponse()
@@ -48,22 +42,24 @@ class LinksController
      */
     public function delete($aGuid)
     {
-        if (! $aGuid)
+        if (! $aGuid){
             return new HttpStatus(HttpStatus::STATUS_404_NOT_FOUND);
+        }
+        $db = LinksContext::createLinksRepository($username);
         
-        $sc = $this->db->createSearchCriteria();
+        $sc = $db->createSearchCriteria();
         if ($guid) {
             $sc->where(LinkModel::GUID, $guid);
         }
         
-        $result = $this->db->search($sc);
+        $result = $db->search($sc);
         if ($result->count() <= 0) {
             return new HttpStatus(HttpStatus::STATUS_404_NOT_FOUND);
         }
         
         $model = $result->offsetGet(0);
         
-        if ($this->db->delete($model)) {
+        if ($db->delete($model)) {
             return new HttpStatus(HttpStatus::STATUS_200_OK);
         } else {
             Logger::get()->logWarning("Could not delete model " . get_class($model) . ' with GUID ' . $aGuid);
@@ -83,20 +79,21 @@ class LinksController
      */
     public function get($username, $guid = false)
     {
-        $sc = $this->db->createSearchCriteria();
+        $db = LinksContext::createLinksRepository($username);
+        $sc = $db->createSearchCriteria();
         
         // when the user is not logged in, then only show the public links
         /* @var $auth auth \compact\auth\IAuthService */
         $auth = Context::get()->getService(Context::SERVICE_AUTH);
         if (!$auth->isLoggedIn() || $auth->getUser()->get(UserModel::USERNAME) !== $username){
-            $sc->where(LinkModel::ISPUBLIC, 1);
+            $sc->where(LinkModel::ISPUBLIC, true);
         }
         
         if ($guid) {
             $sc->where(LinkModel::GUID, $guid);
         }
         
-        $result = $this->db->search($sc);
+        $result = $db->search($sc);
         if ($result->count() > 0) {
             return new HttpStatus(HttpStatus::STATUS_200_OK, new Json($result));
         }
@@ -146,15 +143,17 @@ class LinksController
             return new HttpStatus(HttpStatus::STATUS_401_UNAUTHORIZED);   
         }
         
-        // TODO implement 409
-        $model = ModelUtils::getPost($this->db->getModelConfiguration());
+        $db = LinksContext::createLinksRepository($username);
         
-        if (ModelUtils::isEmpty($model, $this->db->getModelConfiguration()->getFieldNames($model))) {
+        // TODO implement 409
+        $model = ModelUtils::getPost($db->getModelConfiguration());
+        
+        if (ModelUtils::isEmpty($model, $db->getModelConfiguration()->getFieldNames($model))) {
             return new HttpStatus(HttpStatus::STATUS_204_NO_CONTENT);
         }
 
         try {
-            if ($this->db->save($model)) {
+            if ($db->save($model)) {
                 // TODO add location header
                 return new HttpStatus(HttpStatus::STATUS_201_CREATED, new Json($model));
             }
@@ -179,27 +178,30 @@ class LinksController
      */
     public function putAction($guid)
     {
-        if (! $guid)
+        if (! $guid){
             return new HttpStatus(HttpStatus::STATUS_404_NOT_FOUND);
+        }
         
-        $sc = $this->db->createSearchCriteria();
+        $db = LinksContext::createLinksRepository($username);
+        $sc = $db->createSearchCriteria();
+        
         if ($guid) {
             $sc->where(LinkModel::GUID, $guid);
         }
         
         // check if model exists
-        $result = $this->db->search($sc);
+        $result = $db->search($sc);
         if ($result->count() <= 0) {
             return new HttpStatus(HttpStatus::STATUS_404_NOT_FOUND);
         }
         
-        $model = ModelUtils::getPost($this->db->getModelConfiguration(), new Model());
+        $model = ModelUtils::getPost($db->getModelConfiguration(), new Model());
         
-        if (ModelUtils::isEmpty($model, $this->db->getModelConfiguration()->getFieldNames($model))) {
+        if (ModelUtils::isEmpty($model, $db->getModelConfiguration()->getFieldNames($model))) {
             return new HttpStatus(HttpStatus::STATUS_204_NO_CONTENT);
         }
         
-        if ($this->db->save($model)) {
+        if ($db->save($model)) {
             return new HttpStatus(HttpStatus::STATUS_200_OK, new Json($model));
         }
         
@@ -218,22 +220,24 @@ class LinksController
      */
     public function patchAction($guid)
     {
-        if (! $guid)
+        if (! $guid){
             return new HttpStatus(HttpStatus::STATUS_404_NOT_FOUND);
+        }
         
-        $sc = $this->db->createSearchCriteria();
+        $db = LinksContext::createLinksRepository($username);
+        $sc = $db->createSearchCriteria();
         if ($guid) {
             $sc->where(LinkModel::GUID, $guid);
         }
         
         // check if model exists
-        $result = $this->db->search($sc);
+        $result = $db->search($sc);
         if ($result->count() <= 0) {
             return new HttpStatus(HttpStatus::STATUS_404_NOT_FOUND);
         }
         $model = $result->offsetGet(0);
         
-        $postModel = ModelUtils::getPost($this->db->getModelConfiguration(), new Model());
+        $postModel = ModelUtils::getPost($db->getModelConfiguration(), new Model());
         
         $fields = null;
         $vars = get_object_vars($postModel);
@@ -246,7 +250,7 @@ class LinksController
             return new HttpStatus(HttpStatus::STATUS_204_NO_CONTENT); // no content
         }
         
-        if ($this->db->save($dbModel)) {
+        if ($db->save($dbModel)) {
             return new HttpStatus(HttpStatus::STATUS_200_OK, new Json($dbModel));
         }
         

@@ -5,6 +5,9 @@ use compact\IAppContext;
 use compact\Context;
 use compact\routing\Router;
 use links\LinksController;
+use compact\repository\json\JsonRepository;
+use compact\repository\DefaultModelConfiguration;
+use compact\logging\Logger;
 
 /**
  *
@@ -16,6 +19,17 @@ class LinksContext implements IAppContext
 
     private static $GUID_REGEX = "([a-z0-9]{8})-([a-z0-9]{4})-([a-z0-9]{4})-([a-z0-9]{4})-([a-z0-9]{12})";
 
+    
+    /**
+     * Creates a new Links repository
+     * @param string $username
+     */
+    public static function createLinksRepository($username){
+        $file = new \SplFileInfo(__DIR__ . '/db/'.$username.'.json');
+        
+        Logger::get()->logFine($file->getPathname());
+        return new JsonRepository(new DefaultModelConfiguration('app\links\db\LinkModel'), $file);
+    }
     /**
      * (non-PHPdoc)
      *
