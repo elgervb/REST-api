@@ -89,7 +89,7 @@ class LinksController
         /* @var $auth auth \compact\auth\IAuthService */
         $auth = Context::get()->getService(Context::SERVICE_AUTH);
         if (!$auth->isLoggedIn() || $auth->getUser()->get(UserModel::USERNAME) !== $username){
-            $sc->where(LinkModel::ISPRIVATE, false);
+            $sc->where(LinkModel::ISPUBLIC, 1);
         }
         
         if ($guid) {
@@ -128,21 +128,31 @@ class LinksController
     /**
      * Create a new model
      *
+     * @param string $username the username of the user adding the link
+     *
      * @return HttpStatus 201 | 204 | 409 | 422 //
      *         201: created with a location header to the new /model/{id} containing the new ID,
      *         204 no content: when no post data available,
+     *         401 not authorized when the user is not logged in
      *         409 conflict on double entry
      *         422 Unprocessable Entity on validation errors
      */
-    public function post()
+    public function post($username)
     {
-        // TODO implement 409 && 422
+        // when the user is not logged in, then only show the public links
+        /* @var $auth auth \compact\auth\IAuthService */
+        $auth = Context::get()->getService(Context::SERVICE_AUTH);
+        if (!$auth->isLoggedIn() || $auth->getUser()->get(UserModel::USERNAME) !== $username){
+            return new HttpStatus(HttpStatus::STATUS_401_UNAUTHORIZED);   
+        }
+        
+        // TODO implement 409
         $model = ModelUtils::getPost($this->db->getModelConfiguration());
         
         if (ModelUtils::isEmpty($model, $this->db->getModelConfiguration()->getFieldNames($model))) {
-            return new HttpStatus(204);
+            return new HttpStatus(HttpStatus::STATUS_204_NO_CONTENT);
         }
-        
+
         try {
             if ($this->db->save($model)) {
                 // TODO add location header
