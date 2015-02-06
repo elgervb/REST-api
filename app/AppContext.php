@@ -22,7 +22,7 @@ use compact\auth\impl\SessionAuth;
 class AppContext extends MultiAppContext
 {
     const USER_CONTEXT = "/user";    
-    const LINKS_CONTEXT = "/admin/links";
+    const LINKS_CONTEXT = "/(.*)/links";
 
     public function __construct()
     {
