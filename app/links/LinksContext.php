@@ -41,13 +41,13 @@ class LinksContext implements IAppContext
         }, 'OPTIONS');
         
         // return all links
-        $router->add('^/links/?$', function() use ($ctrl){
-            return $ctrl->get();
+        $router->add('^/(.*)/links/?$', function($username) use ($ctrl){
+            return $ctrl->get($username);
         }, 'GET');
         
         // return one link
-        $router->add('^/links/('.self::$GUID_REGEX.')/?$', function($guid) use ($ctrl){
-            return $ctrl->get($guid);
+        $router->add('^/(.*)/links/('.self::$GUID_REGEX.')/?$', function($username, $guid) use ($ctrl){
+            return $ctrl->get($username, $guid);
         }, 'GET');
         
         // Add a new link
