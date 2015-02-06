@@ -1,7 +1,6 @@
 <?php
 namespace app;
 
-use compact\IAppContext;
 use compact\Context;
 use compact\routing\Router;
 use compact\handler\AssertHandler;
@@ -12,8 +11,6 @@ use app\links\LinksContext;
 use lib\MultiAppContext;
 use compact\handler\impl\http\HttpStatusHandler;
 use user\UserContext;
-use compact\repository\pdo\sqlite\SQLiteDynamicModelConfiguration;
-use compact\repository\pdo\sqlite\SQLiteRepository;
 use compact\auth\provider\PDOAuthProvider;
 use compact\auth\impl\SessionAuth;
 
@@ -24,28 +21,17 @@ use compact\auth\impl\SessionAuth;
  */
 class AppContext extends MultiAppContext
 {
+    const USER_CONTEXT = "/user";    
+    const LINKS_CONTEXT = "/admin/links";
 
     public function __construct()
     {
         parent::__construct();
         
-        $this->add('/links', new LinksContext());
-        $this->add('/user', new UserContext());
+        $this->add(self::LINKS_CONTEXT, new LinksContext());
+        $this->add(self::USER_CONTEXT, new UserContext(), true);
     }
     
-    public function createUserRepository(){
-        // Create SQlite DB when needed
-        $sqliteSqlPath = Context::get()->basePath('app/user/db/user.sqlite.sql');
-        $dbPath = $sqliteSqlPath->getPath() . '/user.sqlite';
-        $config = new SQLiteDynamicModelConfiguration('user');
-        $startQuery = "";
-        
-        if (! file_exists($dbPath)) {
-            $startQuery = file_get_contents($sqliteSqlPath);
-        }
-        
-        return new SQLiteRepository($config, "sqlite:" . $dbPath, $startQuery);
-    }
     /*
      * (non-PHPdoc) @see \compact\IAppContext::handlers()
      */
@@ -83,7 +69,7 @@ class AppContext extends MultiAppContext
     {
         parent::services($ctx);
         
-        $db = $this->createUserRepository();
+        $db = UserContext::createUserRepository();
         
         $ctx->addService(Context::SERVICE_AUTH, function () use ($db)
         {

@@ -31,9 +31,7 @@ class UserController
         $this->auth = Context::get()->getService(Context::SERVICE_AUTH);
         assert('$this->auth instanceof \compact\auth\IAuthService');
         
-        /* @var $appCtx \app\AppContext */
-        $appCtx = Context::get()->getAppContext();
-        $this->db = $appCtx->createUserRepository();
+        $this->db = UserContext::createUserRepository();
         
         // allow CORS
         Context::get()->http()
