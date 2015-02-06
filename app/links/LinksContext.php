@@ -51,8 +51,8 @@ class LinksContext implements IAppContext
         }, 'GET');
         
         // Add a new link
-        $router->add('^/links/?$', function() use ($ctrl){
-            return $ctrl->post();
+        $router->add('^/(.*)/links/?$', function($username) use ($ctrl){
+            return $ctrl->post($username);
         }, 'POST');
         
         
