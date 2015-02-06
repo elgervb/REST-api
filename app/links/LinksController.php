@@ -10,6 +10,8 @@ use compact\utils\ModelUtils;
 use compact\http\HttpSession;
 use compact\handler\impl\http\HttpStatus;
 use compact\logging\Logger;
+use user\UserContext;
+use compact\auth\user\UserModel;
 
 /**
  *
@@ -79,9 +81,17 @@ class LinksController
      *         200 with JSON of one model when $guid not is null else it will return a resultset with models
      *         204 no content when there are no models in the database or the id is not known
      */
-    public function get($guid = false)
+    public function get($username, $guid = false)
     {
         $sc = $this->db->createSearchCriteria();
+        
+        // when the user is not logged in, then only show the public links
+        /* @var $auth auth \compact\auth\IAuthService */
+        $auth = Context::get()->getService(Context::SERVICE_AUTH);
+        if (!$auth->isLoggedIn() || $auth->getUser()->get(UserModel::USERNAME) !== $username){
+            $sc->where(LinkModel::ISPRIVATE, false);
+        }
+        
         if ($guid) {
             $sc->where(LinkModel::GUID, $guid);
         }
