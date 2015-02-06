@@ -4,6 +4,7 @@ namespace lib;
 use compact\IAppContext;
 use compact\Context;
 use compact\routing\Router;
+use compact\logging\Logger;
 
 /**
  * Application Context for multiple applications.
@@ -29,13 +30,29 @@ class MultiAppContext implements IAppContext
     /**
      * Add a new AppContext for a path
      * 
-     * @param string $startPath The start path of the application
+     * @param string $regex Include the appcontext when the regex matches the request path
+     * @param IAppContext $appCtx The app context to add
      * 
      * @param IAppContext $appCtx
      */
-    public function add($startPath, IAppContext $appCtx)
+    public function add($regex, IAppContext $appCtx)
     {
-        $this->contexts->offsetSet($startPath, $appCtx);
+        // add / around the regex for regex PHP syntax and add .* at the end
+        $regex = '/' . preg_replace("/\//", "\\\/", $regex) . '.*/i';
+        $this->contexts->offsetSet($regex , $appCtx);
+    }
+    
+    /**
+     * Returns a context registered at a path
+     * 
+     * @param string $contextpath
+     * @return IAppContext|NULL
+     */
+    public function getContext($contextpath){
+        if ($this->contexts->offsetExists($contextpath)){
+            return $this->contexts->offsetGet($contextpath);
+        }
+        return null;
     }
 
     /**
@@ -49,8 +66,8 @@ class MultiAppContext implements IAppContext
             ->getPathInfo();
         
         /* @var compact\IAppContext $appCtx */
-        foreach ($this->contexts as $start => $appCtx) {
-            if (substr($path, 0, strlen($start)) === $start){
+        foreach ($this->contexts as $regex => $appCtx) {
+            if (preg_match($regex, $path)){
                 $appCtx->services($ctx);
             }
         }
@@ -67,8 +84,8 @@ class MultiAppContext implements IAppContext
         ->getPathInfo();
         
         /* @var compact\IAppContext $appCtx */
-        foreach ($this->contexts as $start => $appCtx) {
-            if (substr($path, 0, strlen($start)) === $start){
+        foreach ($this->contexts as $regex => $appCtx) {
+            if (preg_match($regex, $path)){
                 $appCtx->routes($router);
             }
         }
@@ -85,8 +102,8 @@ class MultiAppContext implements IAppContext
         ->getPathInfo();
         
         /* @var compact\IAppContext $appCtx */
-        foreach ($this->contexts as $start => $appCtx) {
-            if (substr($path, 0, strlen($start)) === $start){
+        foreach ($this->contexts as $regex => $appCtx) {
+            if (preg_match($regex, $path)){
                 $appCtx->handlers($ctx);
             }
         }
