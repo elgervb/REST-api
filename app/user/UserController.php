@@ -180,15 +180,14 @@ class UserController
         Logger::get()->logNormal("Registered new user " . $user->{UserModel::USERNAME} . " with activation code " . $user->{UserModel::ACTIVATION});
         
         // send the user a activation mail
-        // TODO enable in production mode
-        // $mail = new Sendmail();
-        // $mail->to($user->get(UserModel::EMAIL));
-        // $mail->from("elgervb@gmail.com", "Links");
-        // $mail->subject("Activation link for your links account");
-        // $tpl = new ViewModel('activationlink.html');
-        // $tpl->{"activationlink"} = Context::siteUrl() . "/user/activate/" . $user->get(UserModel::ACTIVATION);
-        // $mail->text($tpl->render());
-        // $mail->send();
+        $mail = new Sendmail();
+        $mail->to($user->get(UserModel::EMAIL));
+        $mail->from("elgervb@gmail.com", "Links");
+        $mail->subject("Activation link for your links account");
+        $tpl = new ViewModel(__DIR__ . '/activationlink.html');
+        $tpl->{"activationlink"} = Context::siteUrl() . "/user/activate/" . $user->get(UserModel::ACTIVATION);
+        $mail->text($tpl->render());
+        $mail->send();
         $user->{UserModel::PASSWORD} = "";
         return new HttpStatus(200, new Json($user));
     }
