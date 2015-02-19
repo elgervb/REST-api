@@ -185,7 +185,7 @@ class UserController
         $mail->from("elgervb@gmail.com", "Links");
         $mail->subject("Activation link for your links account");
         $tpl = new ViewModel(__DIR__ . '/activationlink.html');
-        $tpl->{"activationlink"} = Context::siteUrl() . "/user/activate/" . $user->get(UserModel::ACTIVATION);
+        $tpl->{"activationcode"} = $user->get(UserModel::ACTIVATION);
         $mail->text($tpl->render());
         $mail->send();
         $user->{UserModel::PASSWORD} = "";
