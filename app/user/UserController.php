@@ -70,7 +70,7 @@ class UserController
             return new HttpStatus(200);
         }
         
-        return new HttpStatus(204);
+        return new HttpStatus(204, new Json(array("message"=>"No such activation code found")));
     }
 
     /**
