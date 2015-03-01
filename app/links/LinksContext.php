@@ -17,7 +17,7 @@ use compact\logging\Logger;
 class LinksContext implements IAppContext
 {
 
-    private static $GUID_REGEX = "([a-z0-9]{8})-([a-z0-9]{4})-([a-z0-9]{4})-([a-z0-9]{4})-([a-z0-9]{12})";
+    private static $GUID_REGEX = "([a-zA-Z0-9]{8})-([a-zA-Z0-9]{4})-([a-zA-Z0-9]{4})-([a-zA-Z0-9]{4})-([a-zA-Z0-9]{12})";
 
     
     /**
@@ -47,6 +47,8 @@ class LinksContext implements IAppContext
      */
     public function routes(Router $router)
     {
+        Logger::get()->logFinest("Include LinksContext routes");
+        
         $ctrl = new LinksController();
         
         // Enable CORS preflight request
@@ -69,7 +71,10 @@ class LinksContext implements IAppContext
             return $ctrl->post($username);
         }, 'POST');
         
-        
+        // PATCH /username/links/A19A5424-E93B-3513-F8D0-9314A12CF182
+        $router->add('^/(.*)/links/('.self::$GUID_REGEX.')/?$', function($username, $guid) use ($ctrl){
+            return $ctrl->patch($username, $guid);
+        }, 'PATCH');
     }
 
     /**

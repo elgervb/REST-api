@@ -11,6 +11,7 @@ use compact\logging\Logger;
 use user\UserContext;
 use compact\auth\user\UserModel;
 use app\links\LinksContext;
+use compact\mvvm\impl\Model;
 
 /**
  *
@@ -176,7 +177,7 @@ class LinksController
      *         200 when update was successfull with in the body the saved model
      *         204 no content when no post data available
      */
-    public function putAction($guid)
+    public function put($guid)
     {
         if (! $guid){
             return new HttpStatus(HttpStatus::STATUS_404_NOT_FOUND);
@@ -212,13 +213,15 @@ class LinksController
     /**
      * Updates part of a model
      *
-     * @param $aId mixed            
+     * @param $username the username
+     * @param $guid string the guid of the link
+     *        
      * @return HttpError 200 | 204 | 404 //
      *         404 when $aId was not found.
      *         200 when update was successfull with in the body the saved model
      *         204 no content when no post data available
      */
-    public function patchAction($guid)
+    public function patch($username, $guid)
     {
         if (! $guid){
             return new HttpStatus(HttpStatus::STATUS_404_NOT_FOUND);
@@ -237,7 +240,7 @@ class LinksController
         }
         $model = $result->offsetGet(0);
         
-        $postModel = ModelUtils::getPost($db->getModelConfiguration(), new Model());
+        $postModel = ModelUtils::getPost($db->getModelConfiguration(), new LinkModel());
         
         $fields = null;
         $vars = get_object_vars($postModel);
@@ -250,8 +253,11 @@ class LinksController
             return new HttpStatus(HttpStatus::STATUS_204_NO_CONTENT); // no content
         }
         
-        if ($db->save($dbModel)) {
-            return new HttpStatus(HttpStatus::STATUS_200_OK, new Json($dbModel));
+        // add GUID, so we know it's an update instead of an insert
+        $model->set(LinkModel::GUID, $guid);
+        
+        if ($db->save($model)) {
+            return new HttpStatus(HttpStatus::STATUS_200_OK, new Json($model));
         }
         
         Logger::get()->logWarning("Could not patch model " . get_class($model) . ' with GUID ' . $aGuid);
