@@ -75,6 +75,11 @@ class LinksContext implements IAppContext
         $router->add('^/(.*)/links/('.self::$GUID_REGEX.')/?$', function($username, $guid) use ($ctrl){
             return $ctrl->patch($username, $guid);
         }, 'PATCH');
+        
+        // PUT /username/links/A19A5424-E93B-3513-F8D0-9314A12CF182
+        $router->add('^/(.*)/links/('.self::$GUID_REGEX.')/?$', function($username, $guid) use ($ctrl){
+            return $ctrl->patch($username, $guid);
+        }, 'PUT');
     }
 
     /**
